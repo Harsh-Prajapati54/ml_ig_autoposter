@@ -1,6 +1,7 @@
 """
 Renders handwritten engineering study notes on grid paper.
-Includes smart text wrapping, bullet point indentation, and transparent diagrams.
+Includes smart text wrapping, bullet point indentation, transparent diagrams,
+and automatic multi-slide splitting to prevent text overflow.
 """
 import os
 import time
@@ -14,6 +15,7 @@ import config
 W, H = 1080, 1350
 MARGIN_LEFT = 140  
 PAD_RIGHT = 80
+MAX_CONTENT_Y = H - 120  # Keep text away from the very bottom footer
 
 # Notebook Colors
 PAPER_BG = (252, 252, 249)       
@@ -44,12 +46,9 @@ def draw_notebook_background(draw: ImageDraw.ImageDraw):
     draw.line([(MARGIN_LEFT, 0), (MARGIN_LEFT, H)], fill=MARGIN_LINE, width=2)
 
 def fetch_mermaid_diagram(mermaid_code: str) -> Image.Image:
-    """Fetches a Mermaid diagram with a transparent background to blend into the paper."""
     try:
         encoded = base64.b64encode(mermaid_code.encode('utf-8')).decode('utf-8')
-        # Using transparent background so the grid lines show through!
         url = f"https://mermaid.ink/img/{encoded}?bgColor=!transparent"
-        
         response = requests.get(url)
         response.raise_for_status()
         return Image.open(BytesIO(response.content)).convert("RGBA")
@@ -58,12 +57,10 @@ def fetch_mermaid_diagram(mermaid_code: str) -> Image.Image:
         return None
 
 def sanitize_text(text: str) -> str:
-    """Removes weird unicode boxes and normalizes dashes."""
     text = text.replace('—', '-').replace('–', '-').replace('•', '-')
     return text.encode('ascii', 'ignore').decode('ascii')
 
 def _wrap_line(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, max_width: int) -> list:
-    """Wraps a single line of text."""
     words = text.split()
     lines, current = [], ""
     for word in words:
@@ -78,48 +75,58 @@ def _wrap_line(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFon
         lines.append(current)
     return lines
 
-def _draw_smart_text(draw, raw_text, font, x, y, max_w, fill):
-    """Draws text paragraph by paragraph, handling bullet indents and spacing."""
+def _paginate_body_text(draw, raw_text, font, max_w):
+    """Pre-calculates text layouts and splits them across pages if they overflow."""
     if not raw_text:
-        return y
+        return [[]]
         
     text = sanitize_text(raw_text)
     paragraphs = text.split('\n')
-    current_y = y
     line_height = font.size * 1.4
+    
+    pages = []
+    current_page_lines = []
+    
+    # Estimate starting room on a slide (roughly 400px used by margins/headers)
+    available_height = MAX_CONTENT_Y - 350 
+    current_y = 0
 
     for p in paragraphs:
         p = p.strip()
         if not p:
-            current_y += line_height * 0.5  # Add half a line of space for empty newlines
+            # Handle explicit empty newlines safely
+            if current_y + (line_height * 0.5) > available_height:
+                pages.append(current_page_lines)
+                current_page_lines = []
+                available_height = MAX_CONTENT_Y - 200 # Reset height for a fresh slide
+                current_y = 0
+            current_page_lines.append(("", 0))
+            current_y += line_height * 0.5
             continue
             
-        # Check if it's a bullet point
         is_bullet = p.startswith('-') or p.startswith('*')
         indent = 40 if is_bullet else 0
-        
-        # Wrap this specific paragraph considering the indent
         wrapped_lines = _wrap_line(draw, p, font, max_w - indent)
         
         for line in wrapped_lines:
-            draw.text((x + indent, current_y), line, font=font, fill=fill)
+            if current_y + line_height > available_height:
+                pages.append(current_page_lines)
+                current_page_lines = []
+                available_height = MAX_CONTENT_Y - 200 
+                current_y = 0
+            
+            current_page_lines.append((line, indent))
             current_y += line_height
             
-        current_y += 10  # Tiny bit of breathing room between paragraphs
+        current_y += 10 # Post-paragraph spacing
 
-    return current_y
+    if current_page_lines:
+        pages.append(current_page_lines)
+        
+    return pages
 
-def render_slide(
-    heading: str,
-    body: str = "",
-    eyebrow: str = "",
-    index: int = 0,
-    total: int = 1,
-    handle: str = "@your.handle",
-    big: bool = False,
-    diagram_code: str = None
-) -> Image.Image:
-    
+def render_base_slide(heading: str, eyebrow: str, handle: str, big: bool = False):
+    """Helper to generate a blank canvas with background elements and headings."""
     img = Image.new("RGB", (W, H), PAPER_BG)
     draw = ImageDraw.Draw(img)
     draw_notebook_background(draw)
@@ -135,116 +142,117 @@ def render_slide(
     heading_text = sanitize_text(heading)
     heading_lines = _wrap_line(draw, heading_text, heading_font, max_w)
     
-    # --- NEW HIGHLIGHTER CODE ---
-    highlight_color = (255, 255, 150) # Bright yellow
-    temp_y = y_cursor
-    for line in heading_lines:
-        # Get the width of the text to know how wide to draw the highlight
-        line_w = draw.textlength(line, font=heading_font)
-        # Draw the yellow rectangle slightly taller and wider than the text
-        draw.rectangle(
-            [MARGIN_LEFT + 15, temp_y + 10, MARGIN_LEFT + 25 + line_w, temp_y + heading_font.size + 5], 
-            fill=highlight_color
-        )
-        temp_y += heading_font.size * 1.2
-    # ----------------------------
-    
     for line in heading_lines:
         draw.text((MARGIN_LEFT + 20, y_cursor), line, font=heading_font, fill=INK_BLACK)
         y_cursor += heading_font.size * 1.2
         
-    y_cursor += 30 # Space below header
+    y_cursor += 30
+    return img, draw, y_cursor, max_w
 
-    # Insert Diagram if it exists
-    if diagram_code:
-        diagram_img = fetch_mermaid_diagram(diagram_code)
-        if diagram_img:
-            target_w = max_w
-            scale = target_w / diagram_img.width
-            target_h = int(diagram_img.height * scale)
-            
-            # Keep diagram from eating the whole page
-            max_diagram_h = int(H * 0.35)
-            if target_h > max_diagram_h:
-                target_h = max_diagram_h
-                target_w = int(diagram_img.width * (max_diagram_h / diagram_img.height))
-                
-            diagram_img = diagram_img.resize((target_w, target_h), Image.Resampling.LANCZOS)
-            
-            # Center the diagram in the readable area
-            x_offset = MARGIN_LEFT + 20 + int((max_w - target_w) / 2)
-            
-            # Paste using the image itself as a mask to preserve transparency
-            img.paste(diagram_img, (x_offset, int(y_cursor)), diagram_img)
-            y_cursor += target_h + 40
-
-    # Draw body text with the smart renderer
-    y_cursor = _draw_smart_text(draw, body, F_BODY(), MARGIN_LEFT + 20, y_cursor, max_w, INK_BLUE)
-
-    # Footer
+def draw_footer(draw, handle, index, total):
     footer_y = H - 60
     draw.text((MARGIN_LEFT + 20, footer_y), handle, font=F_FOOTER(), fill=INK_BLACK)
     if total > 1:
         draw.text((W - PAD_RIGHT - 120, footer_y), f"Page {index + 1}/{total}", font=F_FOOTER(), fill=INK_BLACK)
 
-    return img
-
 def render_post(content: dict, handle: str) -> dict:
     ts = int(time.time())
-    
-    # 1. Create a clean, dedicated subfolder for this specific post
     safe_title = "".join(c if c.isalnum() else "_" for c in content.get("title", "AI_Topic"))[:30].strip("_")
     folder_name = f"{ts}_{safe_title}"
     post_dir = os.path.join(config.OUTPUT_DIR, folder_name)
     os.makedirs(post_dir, exist_ok=True)
 
+    # First, let's look through slides and build out the pagination sequences
+    raw_slides = content["slides"]
+    processed_slides = []
+
+    for i, slide in enumerate(raw_slides, start=1):
+        heading = slide["heading"]
+        body = slide.get("body", "")
+        diagram_code = slide.get("diagram")
+        
+        # Determine pagination split using dummy image setup
+        dummy_img = Image.new("RGB", (W, H))
+        dummy_draw = ImageDraw.Draw(dummy_img)
+        
+        body_pages = _paginate_body_text(dummy_draw, body, F_BODY(), W - MARGIN_LEFT - PAD_RIGHT - 30)
+        
+        for p_idx, page_lines in enumerate(body_pages):
+            eyebrow_text = f"Note {i}" if len(body_pages) == 1 else f"Note {i} ({p_idx + 1}/{len(body_pages)})"
+            processed_slides.append({
+                "heading": heading if p_idx == 0 else f"{heading} (Cont.)",
+                "eyebrow": eyebrow_text,
+                "lines": page_lines,
+                "diagram": diagram_code if p_idx == 0 else None  # Only draw diagram on the first page
+            })
+
+    total_slides = len(processed_slides) + 2 # Add Cover + CTA
     paths = []
-    slides_data = content["slides"]
-    total = len(slides_data) + 2
+    current_index = 0
 
-    # 2. Render and save Cover Slide into the subfolder
-    cover = render_slide(
-        heading=content["title"],
-        body="Swipe for complete notes \n\n- Definitions\n- Architectures\n- Key takeaways",
-        eyebrow="ML/AI STUDY NOTES",
-        index=0, total=total, handle=handle, big=True
-    )
+    # 1. Cover Slide
+    img, draw, y_cursor, max_w = render_base_slide(content["title"], "ML/AI STUDY NOTES", handle, big=True)
+    _ = _paginate_body_text(draw, "Swipe for complete notes \n\n- Definitions\n- Architectures\n- Key takeaways", F_BODY(), max_w)
+    # Basic quick draw for short static cover content
+    cover_body = [("Swipe for complete notes", 0), ("", 0), ("- Definitions", 40), ("- Architectures", 40), ("- Key takeaways", 40)]
+    for line, indent in cover_body:
+        draw.text((MARGIN_LEFT + 20 + indent, y_cursor), line, font=F_BODY(), fill=INK_BLUE)
+        y_cursor += F_BODY().size * 1.4
+    draw_footer(draw, handle, current_index, total_slides)
     cover_path = os.path.join(post_dir, f"{ts}_00_cover.png")
-    cover.save(cover_path)
+    img.save(cover_path)
     paths.append(cover_path)
+    current_index += 1
 
-    # 3. Render and save Content Slides into the subfolder
-    for i, slide in enumerate(slides_data, start=1):
-        img = render_slide(
-            heading=slide["heading"],
-            body=slide.get("body", ""),
-            eyebrow=f"Note {i}",
-            index=i, total=total, handle=handle,
-            diagram_code=slide.get("diagram")
-        )
-        path = os.path.join(post_dir, f"{ts}_{i:02d}.png")
+    # 2. Render Processed Content Slides
+    for slide in processed_slides:
+        img, draw, y_cursor, max_w = render_base_slide(slide["heading"], slide["eyebrow"], handle)
+        
+        if slide["diagram"]:
+            diagram_img = fetch_mermaid_diagram(slide["diagram"])
+            if diagram_img:
+                target_w = max_w
+                scale = target_w / diagram_img.width
+                target_h = int(diagram_img.height * scale)
+                max_diagram_h = int(H * 0.35)
+                if target_h > max_diagram_h:
+                    target_h = max_diagram_h
+                    target_w = int(diagram_img.width * (max_diagram_h / diagram_img.height))
+                diagram_img = diagram_img.resize((target_w, target_h), Image.Resampling.LANCZOS)
+                x_offset = MARGIN_LEFT + 20 + int((max_w - target_w) / 2)
+                img.paste(diagram_img, (x_offset, int(y_cursor)), diagram_img)
+                y_cursor += target_h + 40
+                
+        # Draw the pre-calculated safe text block for this page
+        line_height = F_BODY().size * 1.4
+        for line, indent in slide["lines"]:
+            if not line:
+                y_cursor += line_height * 0.5
+                continue
+            draw.text((MARGIN_LEFT + 20 + indent, y_cursor), line, font=F_BODY(), fill=INK_BLUE)
+            y_cursor += line_height
+            
+        draw_footer(draw, handle, current_index, total_slides)
+        path = os.path.join(post_dir, f"{ts}_{current_index:02d}.png")
         img.save(path)
         paths.append(path)
+        current_index += 1
 
-    # 4. Render and save CTA Slide into the subfolder
-    cta = render_slide(
-        heading="Save these notes!",
-        body="Follow for more daily ML/AI engineering breakdowns.",
-        eyebrow="END OF NOTES",
-        index=total - 1, total=total, handle=handle
-    )
-    cta_path = os.path.join(post_dir, f"{ts}_{len(slides_data)+1:02d}_cta.png")
-    cta.save(cta_path)
+    # 3. CTA Slide
+    img, draw, y_cursor, max_w = render_base_slide("Save these notes!", "END OF NOTES", handle)
+    draw.text((MARGIN_LEFT + 20, y_cursor), "Follow for more daily ML/AI engineering breakdowns.", font=F_BODY(), fill=INK_BLUE)
+    draw_footer(draw, handle, current_index, total_slides)
+    cta_path = os.path.join(post_dir, f"{ts}_{current_index:02d}_cta.png")
+    img.save(cta_path)
     paths.append(cta_path)
 
-    # 5. Create the Caption file in the same folder
+    # 4. Save the Caption file
     caption_path = os.path.join(post_dir, "caption.txt")
     with open(caption_path, "w", encoding="utf-8") as f:
         f.write(content.get("title", "ML Concept") + "\n\n")
         f.write(content.get("caption", "") + "\n\n")
         f.write(" ".join(content.get("hashtags", [])))
 
-    # Return the folder details so the uploader knows where to look
     return {
         "post_dir": post_dir,
         "folder_name": folder_name
