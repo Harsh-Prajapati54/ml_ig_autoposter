@@ -189,22 +189,31 @@ def render_slide(
 
     return img
 
-def render_post(content: dict, handle: str) -> list:
+def render_post(content: dict, handle: str) -> dict:
     ts = int(time.time())
+    
+    # 1. Create a clean, dedicated subfolder for this specific post
+    safe_title = "".join(c if c.isalnum() else "_" for c in content.get("title", "AI_Topic"))[:30].strip("_")
+    folder_name = f"{ts}_{safe_title}"
+    post_dir = os.path.join(config.OUTPUT_DIR, folder_name)
+    os.makedirs(post_dir, exist_ok=True)
+
     paths = []
     slides_data = content["slides"]
     total = len(slides_data) + 2
 
+    # 2. Render and save Cover Slide into the subfolder
     cover = render_slide(
         heading=content["title"],
         body="Swipe for complete notes \n\n- Definitions\n- Architectures\n- Key takeaways",
         eyebrow="ML/AI STUDY NOTES",
         index=0, total=total, handle=handle, big=True
     )
-    cover_path = os.path.join(config.OUTPUT_DIR, f"{ts}_00_cover.png")
+    cover_path = os.path.join(post_dir, f"{ts}_00_cover.png")
     cover.save(cover_path)
     paths.append(cover_path)
 
+    # 3. Render and save Content Slides into the subfolder
     for i, slide in enumerate(slides_data, start=1):
         img = render_slide(
             heading=slide["heading"],
@@ -213,18 +222,30 @@ def render_post(content: dict, handle: str) -> list:
             index=i, total=total, handle=handle,
             diagram_code=slide.get("diagram")
         )
-        path = os.path.join(config.OUTPUT_DIR, f"{ts}_{i:02d}.png")
+        path = os.path.join(post_dir, f"{ts}_{i:02d}.png")
         img.save(path)
         paths.append(path)
 
+    # 4. Render and save CTA Slide into the subfolder
     cta = render_slide(
         heading="Save these notes!",
         body="Follow for more daily ML/AI engineering breakdowns.",
         eyebrow="END OF NOTES",
         index=total - 1, total=total, handle=handle
     )
-    cta_path = os.path.join(config.OUTPUT_DIR, f"{ts}_{len(slides_data)+1:02d}_cta.png")
+    cta_path = os.path.join(post_dir, f"{ts}_{len(slides_data)+1:02d}_cta.png")
     cta.save(cta_path)
     paths.append(cta_path)
 
-    return paths
+    # 5. Create the Caption file in the same folder
+    caption_path = os.path.join(post_dir, "caption.txt")
+    with open(caption_path, "w", encoding="utf-8") as f:
+        f.write(content.get("title", "ML Concept") + "\n\n")
+        f.write(content.get("caption", "") + "\n\n")
+        f.write(" ".join(content.get("hashtags", [])))
+
+    # Return the folder details so the uploader knows where to look
+    return {
+        "post_dir": post_dir,
+        "folder_name": folder_name
+    }

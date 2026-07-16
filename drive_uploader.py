@@ -87,31 +87,19 @@ def upload_file(local_path: str, parent_id: str, name: str = None) -> dict:
     resp.raise_for_status()
     return resp.json()
 
-
-def upload_post(image_paths: list, caption_text: str, folder_name: str) -> str:
+def upload_post(post_dir: str, folder_name: str) -> str:
     """
-    Creates '<folder_name>' (optionally inside GOOGLE_DRIVE_FOLDER_ID), uploads
-    every image plus a caption.txt into it, and returns the folder's Drive link.
+    Creates a folder in Google Drive and uploads every file 
+    found inside the local post_dir to it.
     """
+    # Create the folder in Google Drive
     folder = create_folder(folder_name, parent_id=config.GOOGLE_DRIVE_FOLDER_ID)
     folder_id = folder["id"]
 
-    # Upload all images
-    for path in image_paths:
-        upload_file(path, folder_id)
-
-    # Save caption locally first (Fix for Windows paths and Emoji encoding)
-    caption_path = os.path.join(config.OUTPUT_DIR, f"{int(time.time())}_caption.txt")
-    with open(caption_path, "w", encoding="utf-8") as f:
-        f.write(caption_text)
-        
-    # Upload the text file
-    upload_file(caption_path, folder_id, name="caption.txt")
-
-    # Clean up the local text file (optional, keeps your generated folder clean)
-    try:
-        os.remove(caption_path)
-    except OSError:
-        pass
+    # Sweep through the local folder and upload everything (images + caption.txt)
+    for filename in sorted(os.listdir(post_dir)):
+        file_path = os.path.join(post_dir, filename)
+        if os.path.isfile(file_path):
+            upload_file(file_path, folder_id, name=filename)
 
     return folder.get("webViewLink") or f"https://drive.google.com/drive/folders/{folder_id}"
