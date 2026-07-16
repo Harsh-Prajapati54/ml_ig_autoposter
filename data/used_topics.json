@@ -13,6 +13,7 @@
     "Audio source separation for AI remixing",
     "How transformers work (no equations)",
     "Feature engineering basics",
-    "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)"
+    "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)",
+    "What activation functions do (ReLU, Sigmoid, Softmax)"
   ]
 }
