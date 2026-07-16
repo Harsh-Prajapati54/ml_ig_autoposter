@@ -5,6 +5,7 @@
     "Why reranking improves retrieval",
     "What is 'attention' in attention is all you need",
     "Tokens vs words: how LLMs read text",
-    "Confusion matrices"
+    "Confusion matrices",
+    "What a loss function really measures"
   ]
 }
