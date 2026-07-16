@@ -12,6 +12,7 @@
     "Agentic workflows: An intro to LangChain & AutoGPT",
     "Audio source separation for AI remixing",
     "How transformers work (no equations)",
-    "Feature engineering basics"
+    "Feature engineering basics",
+    "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)"
   ]
 }
