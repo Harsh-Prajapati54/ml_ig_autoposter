@@ -295,3 +295,5 @@ def render_post(content: dict, handle: str) -> dict:
         "post_dir": post_dir,
         "folder_name": folder_name
     }
+    
+    
