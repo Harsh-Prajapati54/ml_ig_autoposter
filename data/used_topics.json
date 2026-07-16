@@ -1,6 +1,7 @@
 {
   "recent": [
     "What Grad-CAM shows you about a model",
-    "What RAGAS/eval metrics tell you about a RAG pipeline"
+    "What RAGAS/eval metrics tell you about a RAG pipeline",
+    "Why reranking improves retrieval"
   ]
 }
