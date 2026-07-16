@@ -2,17 +2,18 @@
 Orchestrates one full posting run:
 
   pick topic -> generate content (Groq) -> render image(s) (Pillow)
-  -> host image(s) publicly (GitHub) -> publish (Instagram Graph API)
+  -> save to local folder -> host image(s) publicly (GitHub) -> publish (Instagram Graph API)
   -> log the result (GitHub)
 
 Usage:
-    python main.py              # generates AND publishes to Instagram
-    python main.py --dry-run    # generates + saves images locally, skips posting
+    python main.py              # generates AND publishes
+    python main.py --dry-run    # generates + saves locally, skips posting
 """
 import argparse
 import sys
 import time
 import traceback
+import os
 
 import config
 import content_generator
@@ -38,8 +39,11 @@ def run(dry_run: bool = False) -> None:
     content = content_generator.generate_with_retry(topic)
     print(f"[2/4] Format: {content['format']} | Title: {content['title']}")
 
-    image_paths = image_generator.render_post(content, handle=config.IG_HANDLE)
-    print(f"[3/4] Rendered {len(image_paths)} image(s): {image_paths}")
+    # Render images and get the local folder details
+    post_data = image_generator.render_post(content, handle=config.IG_HANDLE)
+    post_dir = post_data["post_dir"]
+    folder_name = post_data["folder_name"]
+    print(f"[3/4] Rendered assets to local folder: {post_dir}")
 
     full_caption = content["caption"] + "\n\n" + " ".join(content["hashtags"])
 
@@ -50,17 +54,23 @@ def run(dry_run: bool = False) -> None:
         return
 
     if config.PUBLISH_MODE == "drive":
-        folder_name = f"{time.strftime('%Y-%m-%d')} - {content['title']}"
-        folder_link = drive_uploader.upload_post(image_paths, full_caption, folder_name)
+        # New Drive Logic: Pass the local directory and folder name
+        folder_link = drive_uploader.upload_post(post_dir, folder_name)
         print(f"[4/4] Saved to Drive: {folder_link}")
         result = {"status": "saved_to_drive", "drive_link": folder_link}
 
     else:  # config.PUBLISH_MODE == "instagram"
+        # Extract just the PNG files from the new local folder in order
+        image_files = sorted([f for f in os.listdir(post_dir) if f.endswith(".png")])
+        image_paths = [os.path.join(post_dir, f) for f in image_files]
+        
         image_urls = [github_host.upload_image(p) for p in image_paths]
+        
         if content["format"] == "single":
             media_id = instagram_publisher.publish_single(image_urls[0], full_caption)
         else:
             media_id = instagram_publisher.publish_carousel(image_urls, full_caption)
+            
         print(f"[4/4] Published to Instagram! media_id={media_id}")
         result = {"status": "published", "media_id": media_id}
 
@@ -86,5 +96,3 @@ if __name__ == "__main__":
         print("Run failed:", file=sys.stderr)
         traceback.print_exc()
         sys.exit(1)
-
-
