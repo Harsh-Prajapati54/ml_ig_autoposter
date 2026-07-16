@@ -95,6 +95,14 @@
       "title": "Feature Engineering Basics",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/1AfT9ORrL-hMVqIf6qLdGUkeNFpGlbdAa"
+    },
+    {
+      "timestamp": 1784201636,
+      "topic": "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)",
+      "format": "carousel",
+      "title": "Evaluating Large Language Models",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1g6aAfRU2zl1LB1ZVCcXhHiaZAGrEZ5LQ"
     }
   ]
 }
