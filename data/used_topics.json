@@ -3,6 +3,7 @@
     "What Grad-CAM shows you about a model",
     "What RAGAS/eval metrics tell you about a RAG pipeline",
     "Why reranking improves retrieval",
-    "What is 'attention' in attention is all you need"
+    "What is 'attention' in attention is all you need",
+    "Tokens vs words: how LLMs read text"
   ]
 }
