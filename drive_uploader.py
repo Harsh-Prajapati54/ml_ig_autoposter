@@ -5,14 +5,12 @@ folder, grab everything, and post manually.
 
 Auth: uses a pre-authorized OAuth refresh token (see authorize_drive.py for
 the one-time setup). Scope used is drive.file — non-sensitive, so it needs
-no Google verification review, only App Publishing status = "In production"
-in Cloud Console (also just a checkbox, no review, since the scope is
-non-sensitive) so the refresh token doesn't expire after 7 days.
+no Google verification review.
 """
+import os
 import json
 import mimetypes
 import time
-
 import requests
 
 import config
@@ -70,7 +68,7 @@ def create_folder(name: str, parent_id: str = None) -> dict:
 
 
 def upload_file(local_path: str, parent_id: str, name: str = None) -> dict:
-    name = name or local_path.split("/")[-1]
+    name = name or os.path.basename(local_path)
     mime_type, _ = mimetypes.guess_type(local_path)
     mime_type = mime_type or "application/octet-stream"
     metadata = {"name": name, "parents": [parent_id]}
@@ -98,12 +96,22 @@ def upload_post(image_paths: list, caption_text: str, folder_name: str) -> str:
     folder = create_folder(folder_name, parent_id=config.GOOGLE_DRIVE_FOLDER_ID)
     folder_id = folder["id"]
 
+    # Upload all images
     for path in image_paths:
         upload_file(path, folder_id)
 
-    caption_path = f"/tmp/{int(time.time())}_caption.txt"
-    with open(caption_path, "w") as f:
+    # Save caption locally first (Fix for Windows paths and Emoji encoding)
+    caption_path = os.path.join(config.OUTPUT_DIR, f"{int(time.time())}_caption.txt")
+    with open(caption_path, "w", encoding="utf-8") as f:
         f.write(caption_text)
+        
+    # Upload the text file
     upload_file(caption_path, folder_id, name="caption.txt")
+
+    # Clean up the local text file (optional, keeps your generated folder clean)
+    try:
+        os.remove(caption_path)
+    except OSError:
+        pass
 
     return folder.get("webViewLink") or f"https://drive.google.com/drive/folders/{folder_id}"
