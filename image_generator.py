@@ -135,6 +135,20 @@ def render_slide(
     heading_text = sanitize_text(heading)
     heading_lines = _wrap_line(draw, heading_text, heading_font, max_w)
     
+    # --- NEW HIGHLIGHTER CODE ---
+    highlight_color = (255, 255, 150) # Bright yellow
+    temp_y = y_cursor
+    for line in heading_lines:
+        # Get the width of the text to know how wide to draw the highlight
+        line_w = draw.textlength(line, font=heading_font)
+        # Draw the yellow rectangle slightly taller and wider than the text
+        draw.rectangle(
+            [MARGIN_LEFT + 15, temp_y + 10, MARGIN_LEFT + 25 + line_w, temp_y + heading_font.size + 5], 
+            fill=highlight_color
+        )
+        temp_y += heading_font.size * 1.2
+    # ----------------------------
+    
     for line in heading_lines:
         draw.text((MARGIN_LEFT + 20, y_cursor), line, font=heading_font, fill=INK_BLACK)
         y_cursor += heading_font.size * 1.2
