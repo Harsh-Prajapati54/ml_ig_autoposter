@@ -1,54 +1,69 @@
 """
-Renders Instagram post cards using Pillow.
-Aesthetic: Handwritten engineering study notes on grid paper.
+Renders handwritten engineering study notes on grid paper.
+Includes smart text wrapping, bullet point indentation, and transparent diagrams.
 """
 import os
 import time
+import base64
+import requests
+from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 
 import config
 
 W, H = 1080, 1350
-MARGIN_LEFT = 140  # Space for the red margin line
+MARGIN_LEFT = 140  
 PAD_RIGHT = 80
 
 # Notebook Colors
-PAPER_BG = (252, 252, 249)       # Warm off-white
-GRID_LINE = (225, 230, 235)      # Light blue/grey
-MARGIN_LINE = (255, 140, 140)    # Faded red
-INK_BLACK = (30, 32, 35)         # Not pure black
-INK_BLUE = (35, 75, 160)         # Ballpoint pen blue
-INK_RED = (180, 40, 40)          # Red pen for highlights
+PAPER_BG = (252, 252, 249)       
+GRID_LINE = (225, 230, 235)      
+MARGIN_LINE = (255, 140, 140)    
+INK_BLACK = (30, 32, 35)         
+INK_BLUE = (35, 75, 160)         
+INK_RED = (180, 40, 40)          
 
 def _font(name: str, size: int) -> ImageFont.FreeTypeFont:
     path = os.path.join(config.FONT_DIR, name)
     try:
         return ImageFont.truetype(path, size)
     except OSError:
-        print(f"Warning: Could not find {name}. Falling back to default.")
         return ImageFont.load_default()
 
-# UPDATE THESE TO MATCH YOUR DOWNLOADED HANDWRITING FONT
 F_EYEBROW = lambda: _font("Kalam-Bold.ttf", 35)
 F_HEADING_BIG = lambda: _font("Kalam-Bold.ttf", 85)
 F_HEADING = lambda: _font("Kalam-Bold.ttf", 65)
 F_BODY = lambda: _font("Kalam-Regular.ttf", 42)
 F_FOOTER = lambda: _font("Kalam-Regular.ttf", 30)
 
-
 def draw_notebook_background(draw: ImageDraw.ImageDraw):
-    """Draws the grid paper pattern on the canvas."""
-    # Draw horizontal grid lines
     line_spacing = 60
     for y in range(line_spacing, H, line_spacing):
         draw.line([(0, y), (W, y)], fill=GRID_LINE, width=2)
-        
-    # Draw vertical double red margin
     draw.line([(MARGIN_LEFT - 10, 0), (MARGIN_LEFT - 10, H)], fill=MARGIN_LINE, width=2)
     draw.line([(MARGIN_LEFT, 0), (MARGIN_LEFT, H)], fill=MARGIN_LINE, width=2)
 
+def fetch_mermaid_diagram(mermaid_code: str) -> Image.Image:
+    """Fetches a Mermaid diagram with a transparent background to blend into the paper."""
+    try:
+        encoded = base64.b64encode(mermaid_code.encode('utf-8')).decode('utf-8')
+        # Using transparent background so the grid lines show through!
+        url = f"https://mermaid.ink/img/{encoded}?bgColor=!transparent"
+        
+        response = requests.get(url)
+        response.raise_for_status()
+        return Image.open(BytesIO(response.content)).convert("RGBA")
+    except Exception as e:
+        print(f"Failed to render diagram: {e}")
+        return None
 
-def _wrap(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, max_width: int) -> list:
+def sanitize_text(text: str) -> str:
+    """Removes weird unicode boxes and normalizes dashes."""
+    text = text.replace('—', '-').replace('–', '-').replace('•', '-')
+    return text.encode('ascii', 'ignore').decode('ascii')
+
+def _wrap_line(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, max_width: int) -> list:
+    """Wraps a single line of text."""
     words = text.split()
     lines, current = [], ""
     for word in words:
@@ -63,22 +78,36 @@ def _wrap(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, ma
         lines.append(current)
     return lines
 
+def _draw_smart_text(draw, raw_text, font, x, y, max_w, fill):
+    """Draws text paragraph by paragraph, handling bullet indents and spacing."""
+    if not raw_text:
+        return y
+        
+    text = sanitize_text(raw_text)
+    paragraphs = text.split('\n')
+    current_y = y
+    line_height = font.size * 1.4
 
-def _draw_multiline(draw, lines, font, x, y, fill, line_gap=1.5):
-    line_height = font.size * line_gap
-    for i, line in enumerate(lines):
-        draw.text((x, y + i * line_height), line, font=font, fill=fill)
-    return y + len(lines) * line_height
+    for p in paragraphs:
+        p = p.strip()
+        if not p:
+            current_y += line_height * 0.5  # Add half a line of space for empty newlines
+            continue
+            
+        # Check if it's a bullet point
+        is_bullet = p.startswith('-') or p.startswith('*')
+        indent = 40 if is_bullet else 0
+        
+        # Wrap this specific paragraph considering the indent
+        wrapped_lines = _wrap_line(draw, p, font, max_w - indent)
+        
+        for line in wrapped_lines:
+            draw.text((x + indent, current_y), line, font=font, fill=fill)
+            current_y += line_height
+            
+        current_y += 10  # Tiny bit of breathing room between paragraphs
 
-
-def _footer(draw, handle: str, index: int, total: int):
-    y = H - 60
-    draw.text((MARGIN_LEFT + 20, y), handle, font=F_FOOTER(), fill=INK_BLACK)
-    
-    if total > 1:
-        text = f"Page {index + 1}/{total}"
-        draw.text((W - PAD_RIGHT - 120, y), text, font=F_FOOTER(), fill=INK_BLACK)
-
+    return current_y
 
 def render_slide(
     heading: str,
@@ -87,7 +116,8 @@ def render_slide(
     index: int = 0,
     total: int = 1,
     handle: str = "@your.handle",
-    big: bool = False
+    big: bool = False,
+    diagram_code: str = None
 ) -> Image.Image:
     
     img = Image.new("RGB", (W, H), PAPER_BG)
@@ -102,20 +132,48 @@ def render_slide(
         y_cursor += 70
 
     heading_font = F_HEADING_BIG() if big else F_HEADING()
-    heading_lines = _wrap(draw, heading, heading_font, max_w)
+    heading_text = sanitize_text(heading)
+    heading_lines = _wrap_line(draw, heading_text, heading_font, max_w)
     
-    # Write the heading in Black Ink
-    y_cursor = _draw_multiline(draw, heading_lines, heading_font, MARGIN_LEFT + 20, y_cursor, INK_BLACK, line_gap=1.2)
-    
-    # Write the body text in Blue Ink (like a pen)
-    if body:
-        # Increase line gap so it roughly aligns with the grid paper lines
-        body_lines = _wrap(draw, body, F_BODY(), max_w)
-        _draw_multiline(draw, body_lines, F_BODY(), MARGIN_LEFT + 20, y_cursor + 40, INK_BLUE, line_gap=1.4)
+    for line in heading_lines:
+        draw.text((MARGIN_LEFT + 20, y_cursor), line, font=heading_font, fill=INK_BLACK)
+        y_cursor += heading_font.size * 1.2
+        
+    y_cursor += 30 # Space below header
 
-    _footer(draw, handle, index, total)
+    # Insert Diagram if it exists
+    if diagram_code:
+        diagram_img = fetch_mermaid_diagram(diagram_code)
+        if diagram_img:
+            target_w = max_w
+            scale = target_w / diagram_img.width
+            target_h = int(diagram_img.height * scale)
+            
+            # Keep diagram from eating the whole page
+            max_diagram_h = int(H * 0.35)
+            if target_h > max_diagram_h:
+                target_h = max_diagram_h
+                target_w = int(diagram_img.width * (max_diagram_h / diagram_img.height))
+                
+            diagram_img = diagram_img.resize((target_w, target_h), Image.Resampling.LANCZOS)
+            
+            # Center the diagram in the readable area
+            x_offset = MARGIN_LEFT + 20 + int((max_w - target_w) / 2)
+            
+            # Paste using the image itself as a mask to preserve transparency
+            img.paste(diagram_img, (x_offset, int(y_cursor)), diagram_img)
+            y_cursor += target_h + 40
+
+    # Draw body text with the smart renderer
+    y_cursor = _draw_smart_text(draw, body, F_BODY(), MARGIN_LEFT + 20, y_cursor, max_w, INK_BLUE)
+
+    # Footer
+    footer_y = H - 60
+    draw.text((MARGIN_LEFT + 20, footer_y), handle, font=F_FOOTER(), fill=INK_BLACK)
+    if total > 1:
+        draw.text((W - PAD_RIGHT - 120, footer_y), f"Page {index + 1}/{total}", font=F_FOOTER(), fill=INK_BLACK)
+
     return img
-
 
 def render_post(content: dict, handle: str) -> list:
     ts = int(time.time())
@@ -123,10 +181,9 @@ def render_post(content: dict, handle: str) -> list:
     slides_data = content["slides"]
     total = len(slides_data) + 2
 
-    # 1. Cover Slide
     cover = render_slide(
         heading=content["title"],
-        body="Swipe for complete notes →",
+        body="Swipe for complete notes \n\n- Definitions\n- Architectures\n- Key takeaways",
         eyebrow="ML/AI STUDY NOTES",
         index=0, total=total, handle=handle, big=True
     )
@@ -134,23 +191,20 @@ def render_post(content: dict, handle: str) -> list:
     cover.save(cover_path)
     paths.append(cover_path)
 
-    # 2. Content Slides
     for i, slide in enumerate(slides_data, start=1):
-        # We pass the raw string; Pillow will handle newlines naturally if formatted right, 
-        # or we wrap it via our _wrap function.
         img = render_slide(
             heading=slide["heading"],
-            body=slide.get("body", "").replace("- ", "\n• "), # Convert hyphens to bullet points
+            body=slide.get("body", ""),
             eyebrow=f"Note {i}",
-            index=i, total=total, handle=handle
+            index=i, total=total, handle=handle,
+            diagram_code=slide.get("diagram")
         )
         path = os.path.join(config.OUTPUT_DIR, f"{ts}_{i:02d}.png")
         img.save(path)
         paths.append(path)
 
-    # 3. CTA Slide
     cta = render_slide(
-        heading="Save these notes for later!",
+        heading="Save these notes!",
         body="Follow for more daily ML/AI engineering breakdowns.",
         eyebrow="END OF NOTES",
         index=total - 1, total=total, handle=handle

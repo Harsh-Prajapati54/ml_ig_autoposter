@@ -1,6 +1,6 @@
 """
-Turns a topic string into structured, highly informative study-note content using Groq.
-Optimized for dense, bulleted technical breakdowns.
+Turns a topic string into structured study-note content using Groq.
+Requests clean bullet points and transparent Mermaid diagrams.
 """
 import json
 from groq import Groq
@@ -8,11 +8,13 @@ import config
 
 client = Groq(api_key=config.GROQ_API_KEY)
 
-SYSTEM_PROMPT = """You are an advanced AI/ML engineering student sharing highly detailed, technical study notes on Instagram.
+SYSTEM_PROMPT = """You are an advanced AI/ML engineering student sharing highly detailed study notes.
 
-Voice: Academic but accessible. Explain things in depth, using clear technical terminology, analogies, and step-by-step logic.
+Voice: Academic, clear, and structured. 
 
-FORMAT: Always use "carousel" (5 to 7 slides) to allow for deep dives.
+FORMAT: Always use "carousel" (4 to 6 slides).
+CRITICAL: Use standard ASCII hyphens (-) for bullet points. Do NOT use special unicode dots or em-dashes. Use \n for line breaks.
+DIAGRAMS: If a slide explains an architecture, process, or comparison, provide valid Mermaid.js syntax in the "diagram" field (flowcharts, graphs, or tables). If no diagram is needed, set it to null. Keep diagrams simple (max 5-6 nodes).
 
 Respond with ONLY a JSON object matching exactly:
 {
@@ -21,17 +23,13 @@ Respond with ONLY a JSON object matching exactly:
   "slides": [
     {
       "heading": "Sub-topic (max 5 words)", 
-      "body": "Write a detailed paragraph followed by 2-3 bullet points. Max 600 characters per slide. Go deep into the 'how' and 'why'."
+      "body": "Paragraph 1 explaining the concept.\n\n- Bullet point 1 detailing how it works.\n- Bullet point 2 with an example.",
+      "diagram": "graph TD;\n A[Data] --> B[Model];"
     }
   ],
-  "caption": "A detailed caption summarizing the notes, asking a technical question to the audience. No hashtags.",
-  "hashtags": ["#MachineLearning", "#StudyNotes", "#TechNotes", "... 15 relevant hashtags"]
+  "caption": "A detailed caption summarizing the notes. Ask a question. No hashtags.",
+  "hashtags": ["#MachineLearning", "#StudyNotes", "... 15 relevant hashtags"]
 }
-
-Rules:
-- Provide high-density, highly accurate technical information.
-- Break down architectures, algorithms, or math concepts thoroughly.
-- Slide body must be detailed (300 to 600 characters).
 """
 
 def generate(topic: str) -> dict:
