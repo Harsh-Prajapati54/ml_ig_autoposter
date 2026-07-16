@@ -4,6 +4,7 @@
     "What RAGAS/eval metrics tell you about a RAG pipeline",
     "Why reranking improves retrieval",
     "What is 'attention' in attention is all you need",
-    "Tokens vs words: how LLMs read text"
+    "Tokens vs words: how LLMs read text",
+    "Confusion matrices"
   ]
 }
