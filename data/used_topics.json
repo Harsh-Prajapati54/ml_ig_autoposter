@@ -14,6 +14,7 @@
     "How transformers work (no equations)",
     "Feature engineering basics",
     "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)",
-    "What activation functions do (ReLU, Sigmoid, Softmax)"
+    "What activation functions do (ReLU, Sigmoid, Softmax)",
+    "L1 vs L2 regularization"
   ]
 }
