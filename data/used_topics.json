@@ -17,6 +17,7 @@
     "What activation functions do (ReLU, Sigmoid, Softmax)",
     "L1 vs L2 regularization",
     "Transfer learning in plain English",
-    "Handling imbalanced datasets (SMOTE and beyond)"
+    "Handling imbalanced datasets (SMOTE and beyond)",
+    "Why LLMs hallucinate"
   ]
 }
