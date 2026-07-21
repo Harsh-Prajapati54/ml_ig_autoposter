@@ -18,6 +18,7 @@
     "L1 vs L2 regularization",
     "Transfer learning in plain English",
     "Handling imbalanced datasets (SMOTE and beyond)",
-    "Why LLMs hallucinate"
+    "Why LLMs hallucinate",
+    "BM25 vs dense retrieval vs hybrid search"
   ]
 }
