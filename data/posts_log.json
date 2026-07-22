@@ -143,6 +143,14 @@
       "title": "Why LLMs Hallucinate",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/1G-xJNcNX8hkYY4hO66PoXTHgpdpHtwVb"
+    },
+    {
+      "timestamp": 1784735924,
+      "topic": "Weight initialization: Why starting at zero fails",
+      "format": "carousel",
+      "title": "Weight Initialization: Why Zero Fails",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1OYP3FooWhYdLyGNTKgp5gplKT6zxi4YD"
     }
   ]
 }
