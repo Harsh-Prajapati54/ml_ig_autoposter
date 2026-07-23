@@ -20,6 +20,7 @@
     "Handling imbalanced datasets (SMOTE and beyond)",
     "Why LLMs hallucinate",
     "BM25 vs dense retrieval vs hybrid search",
-    "Weight initialization: Why starting at zero fails"
+    "Weight initialization: Why starting at zero fails",
+    "Sensitivity vs Specificity in medical AI classification"
   ]
 }
