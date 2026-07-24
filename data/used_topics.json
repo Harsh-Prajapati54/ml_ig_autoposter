@@ -21,6 +21,7 @@
     "Why LLMs hallucinate",
     "BM25 vs dense retrieval vs hybrid search",
     "Weight initialization: Why starting at zero fails",
-    "Sensitivity vs Specificity in medical AI classification"
+    "Sensitivity vs Specificity in medical AI classification",
+    "The difference between a Data Scientist and an ML Engineer"
   ]
 }
