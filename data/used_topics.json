@@ -23,6 +23,7 @@
     "Weight initialization: Why starting at zero fails",
     "Sensitivity vs Specificity in medical AI classification",
     "The difference between a Data Scientist and an ML Engineer",
-    "Precision vs recall"
+    "Precision vs recall",
+    "Batch normalization, intuitively"
   ]
 }
