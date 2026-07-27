@@ -24,6 +24,7 @@
     "Sensitivity vs Specificity in medical AI classification",
     "The difference between a Data Scientist and an ML Engineer",
     "Precision vs recall",
-    "Batch normalization, intuitively"
+    "Batch normalization, intuitively",
+    "Zero-shot vs Few-shot prompting"
   ]
 }
