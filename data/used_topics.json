@@ -25,6 +25,7 @@
     "The difference between a Data Scientist and an ML Engineer",
     "Precision vs recall",
     "Batch normalization, intuitively",
-    "Zero-shot vs Few-shot prompting"
+    "Zero-shot vs Few-shot prompting",
+    "Tokens vs words: how LLMs read text"
   ]
 }
