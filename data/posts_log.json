@@ -183,6 +183,14 @@
       "title": "Zero-shot vs Few-shot Prompting",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/1Gyu4nTZ15GtJzZn_14QSSrIZNs6-9iYR"
+    },
+    {
+      "timestamp": 1785255497,
+      "topic": "Tokens vs words: how LLMs read text",
+      "format": "carousel",
+      "title": "Tokens vs Words in LLMs",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1ys5GzLJ-X4L_drVxrH7EAsoSoXCtzWsr"
     }
   ]
 }
