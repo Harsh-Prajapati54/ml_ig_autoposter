@@ -29,6 +29,7 @@
     "Tokens vs words: how LLMs read text",
     "Embeddings: turning meaning into numbers",
     "Feature engineering basics",
-    "Audio source separation for AI remixing"
+    "Audio source separation for AI remixing",
+    "Confusion matrices"
   ]
 }
