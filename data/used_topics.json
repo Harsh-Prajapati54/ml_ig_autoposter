@@ -31,6 +31,7 @@
     "Feature engineering basics",
     "Audio source separation for AI remixing",
     "Confusion matrices",
-    "What is RAG and why everyone's building it"
+    "What is RAG and why everyone's building it",
+    "Pickle vs ONNX: How to save and serve models"
   ]
 }
