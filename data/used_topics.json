@@ -32,6 +32,7 @@
     "Audio source separation for AI remixing",
     "Confusion matrices",
     "What is RAG and why everyone's building it",
-    "Pickle vs ONNX: How to save and serve models"
+    "Pickle vs ONNX: How to save and serve models",
+    "Data leakage: the silent model killer"
   ]
 }
