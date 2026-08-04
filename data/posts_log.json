@@ -239,6 +239,14 @@
       "title": "Pickle vs ONNX: Model Persistence & Serving",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/15Egw9TIBs3TCjIHw8xEW22ESp5DdubpS"
+    },
+    {
+      "timestamp": 1785860806,
+      "topic": "Data leakage: the silent model killer",
+      "format": "carousel",
+      "title": "Data Leakage: The Silent Model Killer",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1KVsGXzGyArkJNf5hBQUHkRm83mcTv2xw"
     }
   ]
 }
