@@ -247,6 +247,14 @@
       "title": "Data Leakage: The Silent Model Killer",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/1KVsGXzGyArkJNf5hBQUHkRm83mcTv2xw"
+    },
+    {
+      "timestamp": 1785946479,
+      "topic": "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)",
+      "format": "carousel",
+      "title": "Evaluating Large Language Models",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1DuWLa_bB51qtXFpyFWikONdxB7rGrDqJ"
     }
   ]
 }
