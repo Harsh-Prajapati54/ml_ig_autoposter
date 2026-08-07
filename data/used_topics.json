@@ -34,6 +34,7 @@
     "What is RAG and why everyone's building it",
     "Pickle vs ONNX: How to save and serve models",
     "Data leakage: the silent model killer",
-    "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)"
+    "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)",
+    "Ensemble methods: Random Forest vs XGBoost"
   ]
 }
