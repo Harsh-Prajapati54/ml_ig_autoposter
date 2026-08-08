@@ -263,6 +263,14 @@
       "title": "Ensemble Methods: Random Forest vs XGBoost",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/1zcbqXmEpv27wVapTAQ5-5f28vFClfAlD"
+    },
+    {
+      "timestamp": 1786201085,
+      "topic": "How ChatGPT-style models are trained (RLHF)",
+      "format": "carousel",
+      "title": "Training ChatGPT-style Models with RLHF",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/10JQT7O9ieWnpF2liO1JSjUcqp-dC5rsI"
     }
   ]
 }
