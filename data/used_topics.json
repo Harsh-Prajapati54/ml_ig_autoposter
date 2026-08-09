@@ -36,6 +36,7 @@
     "Data leakage: the silent model killer",
     "How to evaluate an LLM (Bleu, Rouge, and LLM-as-a-judge)",
     "Ensemble methods: Random Forest vs XGBoost",
-    "How ChatGPT-style models are trained (RLHF)"
+    "How ChatGPT-style models are trained (RLHF)",
+    "Overfitting and regularization"
   ]
 }
