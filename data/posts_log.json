@@ -279,6 +279,14 @@
       "title": "Overfitting and Regularization",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/1vTDPrHWp6YpeWG3yIwQ3FXG0UAoTLoR9"
+    },
+    {
+      "timestamp": 1786375843,
+      "topic": "Why your model works in notebook, fails in prod",
+      "format": "carousel",
+      "title": "Why Model Works in Notebook but Fails in Production",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1GcXYz35bCYZXPaYjH6C3qa1AvajQ7FrU"
     }
   ]
 }
