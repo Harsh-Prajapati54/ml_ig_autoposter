@@ -38,6 +38,7 @@
     "Ensemble methods: Random Forest vs XGBoost",
     "How ChatGPT-style models are trained (RLHF)",
     "Overfitting and regularization",
-    "Why your model works in notebook, fails in prod"
+    "Why your model works in notebook, fails in prod",
+    "Reading a research paper as a student: where to start"
   ]
 }
