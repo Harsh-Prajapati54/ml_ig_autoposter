@@ -44,6 +44,7 @@
     "What a Kaggle competition teaches you that a course doesn't",
     "L1 vs L2 regularization",
     "Semantic search vs Keyword search",
-    "What activation functions do (ReLU, Sigmoid, Softmax)"
+    "What activation functions do (ReLU, Sigmoid, Softmax)",
+    "Vector databases explained (Pinecone, Milvus, Chroma)"
   ]
 }
