@@ -45,6 +45,7 @@
     "L1 vs L2 regularization",
     "Semantic search vs Keyword search",
     "What activation functions do (ReLU, Sigmoid, Softmax)",
-    "Vector databases explained (Pinecone, Milvus, Chroma)"
+    "Vector databases explained (Pinecone, Milvus, Chroma)",
+    "Handling imbalanced datasets (SMOTE and beyond)"
   ]
 }
