@@ -47,6 +47,7 @@
     "What activation functions do (ReLU, Sigmoid, Softmax)",
     "Vector databases explained (Pinecone, Milvus, Chroma)",
     "Handling imbalanced datasets (SMOTE and beyond)",
-    "Train/validation/test splits"
+    "Train/validation/test splits",
+    "Tracking experiments with Weights & Biases"
   ]
 }
