@@ -359,6 +359,14 @@
       "title": "Train/Validation/Test Splits",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/16lexTNV8OY6kVZSAwo7mSh0PDBtOT8PU"
+    },
+    {
+      "timestamp": 1787238301,
+      "topic": "Tracking experiments with Weights & Biases",
+      "format": "carousel",
+      "title": "Tracking Experiments with Weights & Biases",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1E1K-tkd_gEa0lSu1seQdY0a-yv6OJFOz"
     }
   ]
 }
