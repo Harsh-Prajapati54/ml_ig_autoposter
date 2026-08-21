@@ -48,6 +48,7 @@
     "Vector databases explained (Pinecone, Milvus, Chroma)",
     "Handling imbalanced datasets (SMOTE and beyond)",
     "Train/validation/test splits",
-    "Tracking experiments with Weights & Biases"
+    "Tracking experiments with Weights & Biases",
+    "How AI 'hears' music: Spectrograms explained"
   ]
 }
