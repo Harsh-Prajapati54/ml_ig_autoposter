@@ -50,6 +50,7 @@
     "Train/validation/test splits",
     "Tracking experiments with Weights & Biases",
     "How AI 'hears' music: Spectrograms explained",
-    "Crafting a strong profile for a Master's in CS (MS vs GATE)"
+    "Crafting a strong profile for a Master's in CS (MS vs GATE)",
+    "What RAGAS/eval metrics tell you about a RAG pipeline"
   ]
 }
