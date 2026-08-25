@@ -399,6 +399,14 @@
       "title": "Bias-Variance Tradeoff",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/1i90SKM-VT5VF6wRtoeN2xkTWqI3gGj5z"
+    },
+    {
+      "timestamp": 1787670856,
+      "topic": "BM25 vs dense retrieval vs hybrid search",
+      "format": "carousel",
+      "title": "BM25 vs Dense Retrieval vs Hybrid Search",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1SxIDBzkW2zspwsgDecApC4zOfsXnlTgn"
     }
   ]
 }
