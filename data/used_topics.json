@@ -52,6 +52,7 @@
     "How AI 'hears' music: Spectrograms explained",
     "Crafting a strong profile for a Master's in CS (MS vs GATE)",
     "What RAGAS/eval metrics tell you about a RAG pipeline",
-    "Bias-variance tradeoff"
+    "Bias-variance tradeoff",
+    "BM25 vs dense retrieval vs hybrid search"
   ]
 }
