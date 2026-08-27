@@ -415,6 +415,14 @@
       "title": "Retrieval\u2011Augmented Generation (RAG) Overview",
       "status": "saved_to_drive",
       "drive_link": "https://drive.google.com/drive/folders/12C4ykRd782PcLScUi9HRLmzTDqXv--uJ"
+    },
+    {
+      "timestamp": 1787874730,
+      "topic": "Pickle vs ONNX: How to save and serve models",
+      "format": "carousel",
+      "title": "Pickle vs ONNX: Model Saving & Serving",
+      "status": "saved_to_drive",
+      "drive_link": "https://drive.google.com/drive/folders/1ck1F4hOWyQczzll_BZwKRR0ilsakYeBn"
     }
   ]
 }
