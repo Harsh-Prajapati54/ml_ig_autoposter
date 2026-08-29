@@ -56,6 +56,7 @@
     "BM25 vs dense retrieval vs hybrid search",
     "What is RAG and why everyone's building it",
     "Pickle vs ONNX: How to save and serve models",
-    "Understanding Recurrent Neural Networks (RNNs) vs LSTMs"
+    "Understanding Recurrent Neural Networks (RNNs) vs LSTMs",
+    "Sensitivity vs Specificity in medical AI classification"
   ]
 }
