@@ -65,6 +65,7 @@
     "What Grad-CAM shows you about a model",
     "The harsh reality of data cleaning in the real world",
     "Zero-shot vs Few-shot prompting",
-    "Autoencoders: How AI compresses reality"
+    "Autoencoders: How AI compresses reality",
+    "Adam vs SGD: Which optimizer to choose?"
   ]
 }
