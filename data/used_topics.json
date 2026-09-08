@@ -66,6 +66,7 @@
     "The harsh reality of data cleaning in the real world",
     "Zero-shot vs Few-shot prompting",
     "Autoencoders: How AI compresses reality",
-    "Adam vs SGD: Which optimizer to choose?"
+    "Adam vs SGD: Which optimizer to choose?",
+    "Audio source separation for AI remixing"
   ]
 }
