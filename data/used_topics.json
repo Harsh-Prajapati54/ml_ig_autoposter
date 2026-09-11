@@ -69,6 +69,7 @@
     "Adam vs SGD: Which optimizer to choose?",
     "Audio source separation for AI remixing",
     "Advanced RAG: Chunking strategies for better retrieval",
-    "Backpropagation without the scary math"
+    "Backpropagation without the scary math",
+    "Data leakage: the silent model killer"
   ]
 }
