@@ -70,6 +70,7 @@
     "Audio source separation for AI remixing",
     "Advanced RAG: Chunking strategies for better retrieval",
     "Backpropagation without the scary math",
-    "Data leakage: the silent model killer"
+    "Data leakage: the silent model killer",
+    "Why deep learning needs so much data"
   ]
 }
