@@ -73,6 +73,7 @@
     "Data leakage: the silent model killer",
     "Why deep learning needs so much data",
     "Structuring a GitHub portfolio for your first AI/ML role",
-    "Image segmentation vs Bounding boxes"
+    "Image segmentation vs Bounding boxes",
+    "Handling imbalanced datasets (SMOTE and beyond)"
   ]
 }
