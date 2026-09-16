@@ -74,6 +74,7 @@
     "Why deep learning needs so much data",
     "Structuring a GitHub portfolio for your first AI/ML role",
     "Image segmentation vs Bounding boxes",
-    "Handling imbalanced datasets (SMOTE and beyond)"
+    "Handling imbalanced datasets (SMOTE and beyond)",
+    "Why LLMs hallucinate"
   ]
 }
