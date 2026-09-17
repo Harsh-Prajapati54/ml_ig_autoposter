@@ -75,6 +75,7 @@
     "Structuring a GitHub portfolio for your first AI/ML role",
     "Image segmentation vs Bounding boxes",
     "Handling imbalanced datasets (SMOTE and beyond)",
-    "Why LLMs hallucinate"
+    "Why LLMs hallucinate",
+    "BM25 vs dense retrieval vs hybrid search"
   ]
 }
