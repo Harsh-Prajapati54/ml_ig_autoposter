@@ -77,6 +77,7 @@
     "Handling imbalanced datasets (SMOTE and beyond)",
     "Why LLMs hallucinate",
     "BM25 vs dense retrieval vs hybrid search",
-    "Why your model works in notebook, fails in prod"
+    "Why your model works in notebook, fails in prod",
+    "How self-driving cars 'see' the road"
   ]
 }
