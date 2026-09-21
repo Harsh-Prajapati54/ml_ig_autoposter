@@ -79,6 +79,7 @@
     "BM25 vs dense retrieval vs hybrid search",
     "Why your model works in notebook, fails in prod",
     "How self-driving cars 'see' the road",
-    "What a context window actually is"
+    "What a context window actually is",
+    "L1 vs L2 regularization"
   ]
 }
