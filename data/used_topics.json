@@ -82,6 +82,7 @@
     "What a context window actually is",
     "L1 vs L2 regularization",
     "How a neural network actually learns",
-    "Agentic workflows: An intro to LangChain & AutoGPT"
+    "Agentic workflows: An intro to LangChain & AutoGPT",
+    "Object detection vs image classification"
   ]
 }
