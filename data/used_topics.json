@@ -83,6 +83,7 @@
     "L1 vs L2 regularization",
     "How a neural network actually learns",
     "Agentic workflows: An intro to LangChain & AutoGPT",
-    "Object detection vs image classification"
+    "Object detection vs image classification",
+    "Gradient descent, intuitively"
   ]
 }
